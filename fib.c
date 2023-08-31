@@ -22,13 +22,13 @@ int fib_recursive_omp(int n){
     int y = 0;
     int result = 0;
 
-    #pragma omp task shared(x)
+    #pragma omp task shared(x) // se comparte la variable x
     x = fib_recursive_omp(n - 1);
 
-    #pragma omp task shared(y)
+    #pragma omp task shared(y) // se comparte la variable y
     y = fib_recursive_omp(n - 2);
 
-    #pragma omp taskwait
+    #pragma omp taskwait // se espera a que terminen las tareas
     result = x + y;
 
     return result;
@@ -46,31 +46,33 @@ int fib_recursive_omp_fix(int n){
     int result = 0;
 
    
-    if (n <= THRESHOLD){
+    if (n <= THRESHOLD){ // si n es menor al threshold se hace la llamada recursiva normal
 
         x = fib_recursive_omp_fix(n - 1);
 
-    }else{
+    }else{ // si n es mayor al threshold se hace la llamada recursiva con task
+
         #pragma omp task shared(x)
         x = fib_recursive_omp_fix(n - 1);
 
     }
    
-    if (n <= THRESHOLD){
+    if (n <= THRESHOLD){ // si n es menor al threshold se hace la llamada recursiva normal
         y = fib_recursive_omp_fix(n - 2);
     }
-    else{
+    else{ // si n es mayor al threshold se hace la llamada recursiva con task
+
         #pragma omp task shared(y)
         y = fib_recursive_omp_fix(n - 2);
 
     }
 
-    if(n > THRESHOLD)
+    if(n > THRESHOLD)  // si n es mayor al threshold se espera a que terminen las tareas
     {
         #pragma omp taskwait
         result = x + y;
     }
-    else{
+    else{ // si n es menor al threshold se hace la suma normalq
         result = x + y;
     }
 
